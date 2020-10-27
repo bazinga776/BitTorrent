@@ -1,12 +1,14 @@
 public class PeerInfo {
-    public final String peerId,peerAddress,peerPort;
-    public final boolean firstPeer;
+    public String peerId,peerAddress,peerPort;
+    public boolean firstPeer;
+    int index;
 
-    public PeerInfo(String peerId, String peerAddress, String peerPort, boolean firstPeer) {
+    public PeerInfo(String peerId, String peerAddress, String peerPort, boolean firstPeer, int index) {
         this.peerId = peerId;
         this.peerAddress = peerAddress;
         this.peerPort = peerPort;
         this.firstPeer = firstPeer;
+        this.index=index;
     }
 
     public String getPeerId() {
@@ -27,5 +29,9 @@ public class PeerInfo {
 
     public void printAll(){
         System.out.println(getPeerAddress()+getPeerId()+getPeerPort()+isFirstPeer());
+    }
+
+    public int getIndex() {
+        return index;
     }
 }
