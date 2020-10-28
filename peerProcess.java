@@ -133,7 +133,7 @@ public class peerProcess {
                     PeerInfo peerInfo=(PeerInfo) mapElement.getValue();
                     if(peerProcessObj.peerIndex > peerInfo.getIndex())
                     {
-                        Thread tempThread = new Thread(new RemotePeerHandler(
+                        Thread tempThread = new Thread(new PeerInfoHandler(
                                 peerInfo.getPeerAddress(), Integer
                                 .parseInt(peerInfo.getPeerPort()), 1,
                                 peerProcessObj.peerId));
@@ -168,8 +168,5 @@ public class peerProcess {
 
         } catch (Exception e) {
         }
-
-
     }
-
 }
