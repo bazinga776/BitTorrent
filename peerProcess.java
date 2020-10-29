@@ -16,6 +16,7 @@ public class peerProcess {
     Thread threadForListening;
     ServerSocket socketForListening = null;
     Vector<Thread> threadReceiving = new Vector<Thread>();
+    Vector<Thread> threadSending = new Vector<Thread>();
 
 
     void populateCommonConfiguration() {
