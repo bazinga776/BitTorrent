@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.net.Socket;
 
 public class PeerInfoHandler implements Runnable{
@@ -13,7 +14,14 @@ public class PeerInfoHandler implements Runnable{
     //TBI
     }
 
-    public void run(){
+    public PeerInfoHandler(String address, int port, int connType, String selfId) throws IOException {
+        this.connType = connType;
+        this.selfId = selfId;
+        this.peerSocket = new Socket(address, port);
+        //TBI
+    }
 
+    public void run(){
+        //TBI
     }
 }
