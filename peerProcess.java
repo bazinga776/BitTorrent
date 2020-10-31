@@ -13,6 +13,7 @@ public class peerProcess {
     Logger logger;
     int peerIndex;
     int portListeningAt;
+    int PORT_LISTENING_AT;
     Thread threadForListening;
     ServerSocket socketForListening = null;
     Vector<Thread> threadReceiving = new Vector<Thread>();
@@ -56,7 +57,7 @@ public class peerProcess {
 
             }
             commonCfg=new CommonCfg( fileName,  numberOfPreferredNeighbors,  unchokingInterval,
-             optimisticUnchokingInterval,  fileSize,  pieceSize);
+                    optimisticUnchokingInterval,  fileSize,  pieceSize);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -83,7 +84,7 @@ public class peerProcess {
 
     public void createEmptyFile() {
         try {
-           File dir = new File(peerId);
+            File dir = new File(peerId);
             dir.mkdir();
 
             File directory = new File(peerId);
@@ -122,8 +123,30 @@ public class peerProcess {
             peerProcessObj.commonCfg.printAll();
             peerProcessObj.peerInfoHashMap.get(peerProcessObj.peerId).printAll();
 
-         if(!peerProcessObj.isFirst)
+
+            if(peerProcessObj.isFirst)
             {
+                try
+                {
+                    peerProcessObj.socketForListening = new ServerSocket(peerProcessObj.PORT_LISTENING_AT);
+
+                    peerProcessObj.threadForListening = new Thread(new ThreadForListening(peerProcessObj.peerId, peerProcessObj.socketForListening));
+                    peerProcessObj.threadForListening.start();
+                }
+                catch(SocketTimeoutException timeOutEx)
+                {
+                    peerProcessObj.printLog("Time Out Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + timeOutEx.toString());
+                    LogGenerator.stop();
+                    System.exit(0);
+                }
+                catch(IOException IOEx)
+                {
+                    peerProcessObj.printLog("Input Output Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + peerProcessObj.PORT_LISTENING_AT + " " + IOEx.toString());
+                    LogGenerator.stop();
+                    System.exit(0);
+                }
+            }
+            else{
                 peerProcessObj.createEmptyFile();
 
                 Iterator hmIterator = peerProcessObj.peerInfoHashMap.entrySet().iterator();
