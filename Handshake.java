@@ -5,10 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.*;
 
-
 public class Handshake
 {
-	// Attributes
 	private byte[] header = new byte[Constants.SIZE_OF_HANDSHAKE_HEADER];
 	private byte[] peer_ID = new byte[Constants.SIZE_OF_HANDSHAKE_PEERID];
     private byte[] zero_Bits = new byte[Constants.SIZE_OF_ZEROBITS_HANDSHAKE];
@@ -18,9 +16,30 @@ public class Handshake
 
     public Handshake()
     {
-        logger.init("hello.txt");
+        
     }
     
+    public Handshake(String h, String p_ID) {
+
+		try {
+            logger.init("hello.txt");
+			this.handshake_Msg_Header = h;
+			this.header = h.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
+			if (this.header.length > Constants.SIZE_OF_HANDSHAKE_HEADER)
+				throw new Exception("Header is too large.");
+
+			this.handshake_Msg_PeerID = p_ID;
+			this.peer_ID = p_ID.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
+			if (this.peer_ID.length > Constants.SIZE_OF_HANDSHAKE_HEADER)
+				throw new Exception("Peer ID is too large.");
+
+			this.zero_Bits = "0000000000".getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
+		} catch (Exception e) {
+			logger.printLOG(e.toString()+"in constructor");
+		}
+
+	}
+
     public void setHeader(byte[] HS_header) 
     {
         try 
@@ -30,7 +49,7 @@ public class Handshake
         } 
         catch (UnsupportedEncodingException e) 
         {
-			logger.printLOG(e.toString());
+			logger.printLOG(e.toString()+"in setHeader function");
 		}
 	}
 
@@ -44,7 +63,7 @@ public class Handshake
         } 
         catch (UnsupportedEncodingException e) 
         {
-			logger.printLOG(e.toString());
+			logger.printLOG(e.toString()+"in setPeerID function");
 		}
 	}
 	
@@ -63,72 +82,58 @@ public class Handshake
 		return zero_Bits;
     }
     
-    public static Handshake decodeMessage(byte[] msg_Received) 
+    public static Handshake decode(byte[] msg_Received) 
     {
 
 		Handshake handshake = null;
-		byte[] header_Message = null;
-        byte[] peerID_Message = null;
+		
        
-    
+        String decode_header = "";
+        String decode_Zeroes = "";
+        String decode_Peer_ID = "";
+
+        
 
         try 
         {
 			if (msg_Received.length != Constants.SIZE_OF_MESSAGE_HANDSHAKE)
 				throw new Exception("Byte array length not matching.");
 
-			handshake = new Handshake();
-			header_Message = new byte[Constants.SIZE_OF_HANDSHAKE_HEADER];
-            peerID_Message = new byte[Constants.SIZE_OF_HANDSHAKE_PEERID];
+            String decode_mString=new String(msg_Received);
             
-          System.out.println("Initialized");
+            decode_header=decode_mString.substring(0, 18);
+            System.out.println("Header"+decode_header);
+
+            decode_Zeroes=decode_mString.substring(18, 28);
+            System.out.println("zeros:"+decode_Zeroes);
+
+            decode_Peer_ID=decode_mString.substring(28, 32);
+            System.out.println(decode_Peer_ID);
+
             
-            List<Byte> l1 = new ArrayList<>();
-            int i=0;
-            for(i=0;i<Constants.SIZE_OF_HANDSHAKE_HEADER;i++)
-                l1.add(msg_Received[i]);
-            for(int j=i;j<header_Message.length;j++)
-                l1.add(header_Message[j]);
 
-            System.out.println("Done Copying");    
-            
-            header_Message = new byte[l1.size()];
-            for(i=0;i<l1.size();i++)
-                header_Message[i] = l1.get(i);
+            handshake = new Handshake(decode_header,decode_Peer_ID);
 
-            System.out.println("Converting");
-
-            int sourcePosition = Constants.SIZE_OF_HANDSHAKE_HEADER + Constants.SIZE_OF_ZEROBITS_HANDSHAKE;
-            
-            l1.clear();
-            for(i=sourcePosition;i<Constants.SIZE_OF_HANDSHAKE_PEERID;i++)
-                l1.add(peerID_Message[i]);
-            for(int j=i;j<peerID_Message.length;j++)
-                l1.add(peerID_Message[j]);
-            peerID_Message = new byte[l1.size()];
-            for(i=0;i<l1.size();i++)
-                peerID_Message[i] = l1.get(i);
-    
-
-            System.out.println(header_Message.toString());
-            System.out.println(peerID_Message.toString());
-
-			handshake.setHeader(header_Message);
-			handshake.setPeerID(peerID_Message);
 
         } 
         catch (Exception e) 
         {
-			logger.printLOG(e.toString());
+			logger.printLOG(e.toString()+"in decodeMessage function");
 			handshake = null;
 		}
 		return handshake;
 	}
 
-    public static byte[] encodeMessage(Handshake handshake) 
+    public static byte[] encode(Handshake handshake) 
     {
 
         byte[] msg_Send = new byte[Constants.SIZE_OF_MESSAGE_HANDSHAKE];
+
+        String header="";
+        String zeros="";
+        String peerId="";
+
+        System.out.println(msg_Send.length+" before inserting.");
 
         try 
         {
@@ -142,17 +147,10 @@ public class Handshake
             } 
             else
             {   
-                List<Byte> l2 = new ArrayList<>();
-                int i=0;
-                for(i=0;i<handshake.getHeader().length;i++)
-                    l2.add(handshake.getHeader()[i]);
-                for(int j=i;j<msg_Send.length;j++)
-                    l2.add(msg_Send[j]);
-                
-                    msg_Send = new byte[l2.size()];
-                for(i=0;i<l2.size();i++)
-                    msg_Send[i] = l2.get(i);
-			}
+                header=new String(handshake.getHeader());
+            }
+
+            System.out.println(msg_Send.length+" bkp1");
 
             if (handshake.getZeroBits() == null) 
             {
@@ -164,22 +162,11 @@ public class Handshake
             } 
             else 
             {
-                List<Byte> l3 = new ArrayList<>();
-                int i=0;
-                for(i=0;i<Constants.SIZE_OF_HANDSHAKE_HEADER;i++)
-                    l3.add(msg_Send[i]);
+                zeros=new String(handshake.getZeroBits());
+            }
+            
 
-                for(int j=0;j<Constants.SIZE_OF_ZEROBITS_HANDSHAKE - 1;j++)
-                    l3.add(handshake.getZeroBits()[j]);
-
-                for(;i<msg_Send.length;i++)
-                    l3.add(msg_Send[i]);
-                
-                msg_Send = new byte[l3.size()];
-                for(i=0;i<l3.size();i++)
-                    msg_Send[i] = l3.get(i);
-
-			}
+            System.out.println(msg_Send.length+" bkp2");
 			if (handshake.getPeerID() == null) 
 			{
 				throw new Exception("Invalid peer id.");
@@ -190,43 +177,34 @@ public class Handshake
 			} 
 			else 
 			{   
-                List<Byte> l4 = new ArrayList<>();
-                int i=0;
-                for(i=0;i<Constants.SIZE_OF_HANDSHAKE_HEADER + Constants.SIZE_OF_ZEROBITS_HANDSHAKE;i++)
-                    l4.add(msg_Send[i]);
-
-                for(int j=0;j<handshake.getPeerID().length;j++)
-                    l4.add(handshake.getPeerID()[j]);
-
-                for(;i<msg_Send.length;i++)
-                    l4.add(msg_Send[i]);
-                
-                msg_Send = new byte[l4.size()];
-                for(i=0;i<l4.size();i++)
-                    msg_Send[i] = l4.get(i);
-			}
+                peerId=new String(handshake.getPeerID());
+            }
+            
+            System.out.println(msg_Send.length+" bkp3");
 
 		}
 		catch (Exception e) 
 		{
-			logger.printLOG(e.toString());
+			logger.printLOG(e.toString()+"in encodeMessage()");
 			msg_Send = null;
 		}
-
+        msg_Send=(header+zeros+peerId).getBytes();
 		return msg_Send;
     }
     public static void main(String[] args)
     {
-        Handshake hs = new Handshake();
-        byte[] header="header".getBytes();
-        hs.setHeader(header);
-        hs.setPeerID("1001".getBytes());
-        
-        byte[] handshake=Handshake.encodeMessage(hs);
-        Handshake handshake2=Handshake.decodeMessage(handshake);
+        Handshake hs = new Handshake("012345678911111111","1001");
 
-        System.out.println(handshake2.getPeerID().toString());
-        System.out.println(handshake2.getHeader().toString());
+        System.out.println("h".length());
+        
+        byte[] handshake=Handshake.encode(hs);
+        System.out.println(new String(handshake));
+        System.out.println(handshake.length);
+        
+        Handshake handshake2=Handshake.decode(handshake);
+        
+        System.out.println(new String(handshake2.getPeerID()));
+        System.out.println(new String(handshake2.getHeader()));
 
     }
 }
