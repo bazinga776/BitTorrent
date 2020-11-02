@@ -2,13 +2,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class PeerInfoHandler implements Runnable{
     private Socket peerSocket = null;
     private int connectionType;
-    String selfId;
+    String selfId,peerId;
     private static final int ACTIVE_CONNECTION=1;
+    private Handshake handshake;
 
     private static final int PASSIVE_CONNECTION=1;
 
@@ -53,19 +53,87 @@ public class PeerInfoHandler implements Runnable{
     public void run(){
         //TBI
 
-        if(this.connectionType==ACTIVE_CONNECTION){
+        byte []inputHandShake = new byte[32];
 
 
-        }else {
+        try {
+            if (this.connectionType == ACTIVE_CONNECTION) {
 
+                if (!sendHandShakeMessage()) {
+                    logger.printLOG("Failed sending Handshake for " + selfId);
+                    System.exit(0);
+                } else {
+                    logger.printLOG("Success sending Handshake for " + selfId);
+                }
+                while (true) {
+                    inputStream.read(inputHandShake);
+                    handshake = Handshake.decode(inputHandShake);
+                    String header = new String(handshake.getHeader());
+
+                    if (header.equals(Constants.HANDSHAKE_HEADER_NAME)) {
+
+                        peerId = new String(handshake.getPeerID());
+
+                        logger.printLOG(selfId + " is making a connection to  " + peerId);
+
+                        logger.printLOG("received a handshake message from " + peerId+" to "+selfId);
+
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+
+            }else{
+                while(true)
+                {
+                    inputStream.read(inputHandShake);
+                    handshake = Handshake.decode(inputHandShake);
+
+                    String header = new String(handshake.getHeader());
+
+                    if(header.equals(Constants.HANDSHAKE_HEADER_NAME))
+                    {
+                        peerId = new String( handshake.getPeerID());
+
+                        logger.printLOG(selfId + " is making a connection to  " + peerId);
+
+                        logger.printLOG("received a handshake message from " + peerId+" to "+selfId);
+
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                if(!sendHandShakeMessage())
+                {
+
+                    logger.printLOG("Failed sending Handshake for " + selfId);
+                    System.exit(0);
+                } else {
+                    logger.printLOG("Success sending Handshake for " + selfId);
+                }
+
+            }
         }
+        catch (IOException ioException)
+        {
+            logger.printLOG(ioException.toString());
+        }
+
     }
 
-    private boolean sendHandShakeMessage(){
+    private boolean sendHandShakeMessage()
+    {
         boolean success=true;
-        try{
-            outputStream.write("Dummy HandShake Message".getBytes());
-        }catch (Exception e){
+        try
+        {
+            outputStream.write(Handshake.encode(new Handshake(Constants.HANDSHAKE_HEADER_NAME,selfId)));
+        }
+        catch (Exception e)
+        {
             logger.printLOG(e.toString());
             success=false;
         }
