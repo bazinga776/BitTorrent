@@ -1,14 +1,22 @@
 public class PeerInfo {
-    public String peerId,peerAddress,peerPort;
-    public boolean firstPeer;
+    private final String peerId;
+    private final String peerAddress;
+    private final String peerPort;
+    private final boolean hasFile;
+    private final boolean isFirst;
     int index;
 
-    public PeerInfo(String peerId, String peerAddress, String peerPort, boolean firstPeer, int index) {
+    public PeerInfo(String peerId, String peerAddress, String peerPort, boolean hasFile, int index,boolean isFirst) {
         this.peerId = peerId;
         this.peerAddress = peerAddress;
         this.peerPort = peerPort;
-        this.firstPeer = firstPeer;
+        this.hasFile = hasFile;
         this.index=index;
+        this.isFirst=isFirst;
+    }
+
+    public boolean isFirst() {
+        return isFirst;
     }
 
     public String getPeerId() {
@@ -23,12 +31,12 @@ public class PeerInfo {
         return peerPort;
     }
 
-    public boolean isFirstPeer() {
-        return firstPeer;
+    public boolean hasFile() {
+        return hasFile;
     }
 
     public void printAll(){
-        System.out.println(getPeerAddress()+getPeerId()+getPeerPort()+isFirstPeer());
+        System.out.println(getPeerAddress()+getPeerId()+getPeerPort()+hasFile);
     }
 
     public int getIndex() {

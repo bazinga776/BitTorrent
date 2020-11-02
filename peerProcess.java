@@ -12,12 +12,12 @@ public class peerProcess {
     boolean isFirst;
     Logger logger;
     int peerIndex;
-    int portListeningAt;
+    int PORT_LISTENING_AT;
     Thread threadForListening;
     ServerSocket socketForListening = null;
     Vector<Thread> threadReceiving = new Vector<Thread>();
     BitField bitField;
-
+    Vector<Thread> threadSending = new Vector<Thread>();
 
     void populateCommonConfiguration() {
         File myObj = new File("Common.cfg");
@@ -56,7 +56,7 @@ public class peerProcess {
 
             }
             commonCfg=new CommonCfg( fileName,  numberOfPreferredNeighbors,  unchokingInterval,
-             optimisticUnchokingInterval,  fileSize,  pieceSize);
+                    optimisticUnchokingInterval,  fileSize,  pieceSize);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -72,9 +72,15 @@ public class peerProcess {
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();
                 String[] splited = line.split(" ");
-                boolean isFirst=Integer.parseInt(splited[3])==1;
-                peerInfo=new PeerInfo(splited[0], splited[1], splited[2],isFirst,i);
+                boolean hasFile=Integer.parseInt(splited[3])==1;
+                boolean isFirst=false;
+
+
+                if(i==0)
+                    isFirst=true;
+                peerInfo=new PeerInfo(splited[0], splited[1], splited[2],hasFile,i,isFirst);
                 peerInfoHashMap.put(splited[0],peerInfo);
+                i=i+1;
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -83,7 +89,7 @@ public class peerProcess {
 
     public void createEmptyFile() {
         try {
-           File dir = new File(peerId);
+            File dir = new File(peerId);
             dir.mkdir();
 
             File directory = new File(peerId);
@@ -117,55 +123,81 @@ public class peerProcess {
         try {
             peerProcessObj.populateCommonConfiguration();
             peerProcessObj.populatePeerInfo();
-            peerProcessObj.isFirst=peerProcessObj.peerInfoHashMap.get(peerProcessObj.peerId+"").isFirstPeer();
+            peerProcessObj.isFirst=peerProcessObj.peerInfoHashMap.get(peerProcessObj.peerId+"").isFirst();
 
             peerProcessObj.commonCfg.printAll();
             peerProcessObj.peerInfoHashMap.get(peerProcessObj.peerId).printAll();
+
 
             peerProcessObj.bitField = new
                     BitField(peerProcessObj.peerId, peerProcessObj.isFirst, peerProcessObj.commonCfg);
 
 
-//         if(!peerProcessObj.isFirst)
-//            {
-//                peerProcessObj.createEmptyFile();
-//
-//                Iterator hmIterator = peerProcessObj.peerInfoHashMap.entrySet().iterator();
-//
-//                while(hmIterator.hasNext())
-//                {
-//                    Map.Entry mapElement = (Map.Entry)hmIterator.next();
-//                    PeerInfo peerInfo=(PeerInfo) mapElement.getValue();
-//                    if(peerProcessObj.peerIndex > peerInfo.getIndex())
-//                    {
-//                        Thread tempThread = new Thread(new PeerInfoHandler(
-//                                peerInfo.getPeerAddress(), Integer
-//                                .parseInt(peerInfo.getPeerPort()), 1,
-//                                peerProcessObj.peerId));
-//                        peerProcessObj.threadReceiving.add(tempThread);
-//                        tempThread.start();
-//                    }
-//                }
-//
-//
-//                // Spawns a listening thread
-//                try
-//                {
-//                    peerProcessObj.socketForListening = new ServerSocket(peerProcessObj.portListeningAt);
-//                    peerProcessObj.threadForListening = new Thread(new ThreadForListening(peerProcessObj.peerId, peerProcessObj.socketForListening));
-//                    peerProcessObj.threadForListening.start();
-//                }
-//                catch(SocketTimeoutException timeOutEx)
-//                {
-//                    peerProcessObj.printLog("Time Out Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + timeOutEx.toString());
-//                    System.exit(0);
-//                }
-//                catch(IOException IOEx)
-//                {
-//                    peerProcessObj.printLog("Input Output Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + peerProcessObj.threadForListening + " " + IOEx.toString());
-//                    System.exit(0);
-//                }
-//            }
+            if(peerProcessObj.isFirst)
+            {
+                try
+                {
+                    //Start listening on the port.
+                    peerProcessObj.socketForListening = new ServerSocket(peerProcessObj.PORT_LISTENING_AT);
+
+                    peerProcessObj.threadForListening = new Thread(new ThreadForListening(peerProcessObj.peerId, peerProcessObj.socketForListening));
+                    peerProcessObj.threadForListening.start();
+                }
+                catch(SocketTimeoutException timeOutEx)
+                {
+                    peerProcessObj.printLog("Time Out Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + timeOutEx.toString());
+                    peerProcessObj.logger.close();
+                    System.exit(0);
+                }
+                catch(IOException IOEx)
+                {
+                    peerProcessObj.printLog("Input Output Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + peerProcessObj.PORT_LISTENING_AT + " " + IOEx.toString());
+                    peerProcessObj.logger.close();
+                    System.exit(0);
+                }
+            }
+            else{
+                peerProcessObj.createEmptyFile();
+
+                Iterator hmIterator = peerProcessObj.peerInfoHashMap.entrySet().iterator();
+
+                while(hmIterator.hasNext())
+                {
+                    Map.Entry mapElement = (Map.Entry)hmIterator.next();
+                    PeerInfo peerInfo=(PeerInfo) mapElement.getValue();
+                    if(peerProcessObj.peerIndex > peerInfo.getIndex())
+                    {   //Create a connection with ACTIVE connection type
+                        Thread tempThread = new Thread(new PeerInfoHandler(
+                                peerInfo.getPeerAddress(), Integer
+                                .parseInt(peerInfo.getPeerPort()), 1,
+                                peerProcessObj.peerId));
+                        peerProcessObj.threadReceiving.add(tempThread);
+                        tempThread.start();
+                    }
+                }
+
+
+                try
+                {
+                    peerProcessObj.socketForListening = new ServerSocket(peerProcessObj.PORT_LISTENING_AT);
+                    peerProcessObj.threadForListening = new Thread(new ThreadForListening(peerProcessObj.peerId, peerProcessObj.socketForListening));
+                    peerProcessObj.threadForListening.start();
+                }
+                catch(SocketTimeoutException timeOutEx)
+                {
+                    peerProcessObj.printLog("Time Out Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + timeOutEx.toString());
+
+                    peerProcessObj.logger.close();
+                    System.exit(0);
+                }
+                catch(IOException IOEx)
+                {
+                    peerProcessObj.printLog("Input Output Exception for : "+peerProcessObj.peerId + "when starting the thread that is listening" + peerProcessObj.threadForListening + " " + IOEx.toString());
+
+                    peerProcessObj.logger.close();
+                    System.exit(0);
+                }
+            }
 
             peerProcessObj.logger.close();
 
