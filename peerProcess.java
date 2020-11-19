@@ -3,6 +3,14 @@ import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 import java.util.*;
 
+/*
+By
+Venkata Sindhu Kandula (1914 5414)
+Nikhilesh Reddy Tummala (8350-1593)
+Adil Shaik (6998-5592)
+ */
+
+
 public class peerProcess {
 
     String peerId;
@@ -202,6 +210,7 @@ public class peerProcess {
             peerProcessObj.logger.close();
 
         } catch (Exception e) {
+            peerProcessObj.logger.printLOG(e.toString());
         }
     }
 }
