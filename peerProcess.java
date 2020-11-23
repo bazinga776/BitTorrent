@@ -26,6 +26,7 @@ public class peerProcess {
     Vector<Thread> threadReceiving = new Vector<Thread>();
     BitField bitField;
     Vector<Thread> threadSending = new Vector<Thread>();
+    public static BitField curBitField = null;
 
     void populateCommonConfiguration() {
         File myObj = new File("Common.cfg");

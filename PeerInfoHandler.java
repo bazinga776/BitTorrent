@@ -83,7 +83,12 @@ public class PeerInfoHandler implements Runnable{
                         continue;
                     }
                 }
-
+                // Sending BitField...
+                DataMessage d = new DataMessage(Constants.BITFIELD_DATA_MESSAGE, peerProcess.curBitField.encode());
+                byte  []b = DataMessage.encodeMessage(d);
+                outputStream.write(b);
+                //should I add a hash table here?
+                peerProcess.remotePeerInfoHash.get(peerId).state = 8;
             }else{
                 while(true)
                 {

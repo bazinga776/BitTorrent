@@ -7,6 +7,7 @@ import java.util.*;
 
 public class Handshake
 {
+    Constants Constants = new Constants();
 	private byte[] header = new byte[Constants.SIZE_OF_HANDSHAKE_HEADER];
 	private byte[] peer_ID = new byte[Constants.SIZE_OF_HANDSHAKE_PEERID];
     private byte[] zero_Bits = new byte[Constants.SIZE_OF_ZEROBITS_HANDSHAKE];
@@ -96,6 +97,7 @@ public class Handshake
 
         try 
         {
+            Constants Constants = new Constants();
 			if (msg_Received.length != Constants.SIZE_OF_MESSAGE_HANDSHAKE)
 				throw new Exception("Byte array length not matching.");
 
@@ -126,7 +128,7 @@ public class Handshake
 
     public static byte[] encode(Handshake handshake) 
     {
-
+        Constants Constants = new Constants();
         byte[] msg_Send = new byte[Constants.SIZE_OF_MESSAGE_HANDSHAKE];
 
         String header="";

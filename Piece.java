@@ -1,9 +1,18 @@
+import com.sun.org.apache.xpath.internal.functions.FuncFalse;
+
 public class Piece {
     boolean present;
     String fromPeerId;
     byte[] pieceData;
     int pieceIndex;
 
+    public Piece()
+    {
+        pieceData = new byte[CommonCfg.PieceSize];
+        pieceIndex = -1;
+        present = false;
+        fromPeerId = null;
+    }
 
     public Piece(boolean present, String fromPeerId) {
         this.present = present;

@@ -3,8 +3,8 @@ public class CommonCfg {
     private final int numberOfPreferredNeighbors;
     private final int unchokingInterval;
     private final int optimisticUnchokingInterval;
-    private final int FileSize;
-    private final int PieceSize;
+    public static final int FileSize;
+    public static int PieceSize;
 
     public CommonCfg(String fileName, int numberOfPreferredNeighbors, int unchokingInterval,
                      int optimisticUnchokingInterval, int fileSize, int pieceSize) {
@@ -12,8 +12,8 @@ public class CommonCfg {
         this.numberOfPreferredNeighbors = numberOfPreferredNeighbors;
         this.unchokingInterval = unchokingInterval;
         this.optimisticUnchokingInterval = optimisticUnchokingInterval;
-        FileSize = fileSize;
-        PieceSize = pieceSize;
+        this.FileSize = fileSize;
+        this.PieceSize = pieceSize;
     }
 
     public String getFileName() {
