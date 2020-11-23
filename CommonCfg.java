@@ -4,7 +4,7 @@ public class CommonCfg {
     private final int unchokingInterval;
     private final int optimisticUnchokingInterval;
     public static final int FileSize;
-    public static int PieceSize;
+    public static final int PieceSize;
 
     public CommonCfg(String fileName, int numberOfPreferredNeighbors, int unchokingInterval,
                      int optimisticUnchokingInterval, int fileSize, int pieceSize) {
