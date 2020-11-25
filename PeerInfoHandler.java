@@ -10,12 +10,11 @@ public class PeerInfoHandler implements Runnable{
     private static final int ACTIVE_CONNECTION=1;
     private Handshake handshake;
 
-    private static final int PASSIVE_CONNECTION=1;
+    private static final int PASSIVE_CONNECTION=0;
 
     private InputStream inputStream;
     private OutputStream outputStream;
 
-    Logger logger=new Logger();
 
     public PeerInfoHandler(Socket peerSocket, int connectionType, String selfId) {
 
@@ -33,7 +32,7 @@ public class PeerInfoHandler implements Runnable{
             outputStream=peerSocket.getOutputStream();
 
         }catch (IOException ioException){
-            logger.printLOG(ioException.toString());
+            peerProcess.printLog(ioException.toString());
         }
     }
 
@@ -43,7 +42,7 @@ public class PeerInfoHandler implements Runnable{
 
         try{
         this.peerSocket = new Socket(address, port);}catch (Exception exception){
-            logger.printLOG(exception.toString());
+            peerProcess.printLog(exception.toString());
         }
 
         initializeBuffers();
@@ -60,10 +59,10 @@ public class PeerInfoHandler implements Runnable{
             if (this.connectionType == ACTIVE_CONNECTION) {
 
                 if (!sendHandShakeMessage()) {
-                    logger.printLOG("Failed sending Handshake for " + selfId);
+                    peerProcess.printLog("Failed sending Handshake for " + selfId);
                     System.exit(0);
                 } else {
-                    logger.printLOG("Success sending Handshake for " + selfId);
+                    peerProcess.printLog("Success sending Handshake for " + selfId);
                 }
                 while (true) {
                     inputStream.read(inputHandShake);
@@ -74,9 +73,9 @@ public class PeerInfoHandler implements Runnable{
 
                         peerId = new String(handshake.getPeerID());
 
-                        logger.printLOG(selfId + " is making a connection to  " + peerId);
+                        peerProcess.printLog(selfId + " is making a connection to  " + peerId);
 
-                        logger.printLOG("received a handshake message from " + peerId+" to "+selfId);
+                        peerProcess.printLog("received a handshake message from " + peerId+" to "+selfId);
 
                         break;
                     } else {
@@ -87,8 +86,7 @@ public class PeerInfoHandler implements Runnable{
                 DataMessage d = new DataMessage(Constants.BITFIELD_DATA_MESSAGE, peerProcess.curBitField.encode());
                 byte  []b = DataMessage.encodeMessage(d);
                 outputStream.write(b);
-                //should I add a hash table here?
-                peerProcess.remotePeerInfoHash.get(peerId).state = 8;
+                peerProcess.peerInfoHashMap.get(peerId).state = 8;
             }else{
                 while(true)
                 {
@@ -101,9 +99,9 @@ public class PeerInfoHandler implements Runnable{
                     {
                         peerId = new String( handshake.getPeerID());
 
-                        logger.printLOG(selfId + " is making a connection to  " + peerId);
+                        peerProcess.printLog(selfId + " is making a connection to  " + peerId);
 
-                        logger.printLOG("received a handshake message from " + peerId+" to "+selfId);
+                        peerProcess.printLog("received a handshake message from " + peerId+" to "+selfId);
 
                         break;
                     }
@@ -115,17 +113,17 @@ public class PeerInfoHandler implements Runnable{
                 if(!sendHandShakeMessage())
                 {
 
-                    logger.printLOG("Failed sending Handshake for " + selfId);
+                    peerProcess.printLog("Failed sending Handshake for " + selfId);
                     System.exit(0);
                 } else {
-                    logger.printLOG("Success sending Handshake for " + selfId);
+                    peerProcess.printLog("Success sending Handshake for " + selfId);
                 }
-
+                peerProcess.peerInfoHashMap.get(peerId).state = 2;
             }
         }
         catch (IOException ioException)
         {
-            logger.printLOG(ioException.toString());
+            peerProcess.printLog(ioException.toString());
         }
 
     }
@@ -139,7 +137,7 @@ public class PeerInfoHandler implements Runnable{
         }
         catch (Exception e)
         {
-            logger.printLOG(e.toString());
+            peerProcess.printLog(e.toString());
             success=false;
         }
         return success;

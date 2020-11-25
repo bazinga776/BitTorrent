@@ -3,8 +3,8 @@ public class CommonCfg {
     private final int numberOfPreferredNeighbors;
     private final int unchokingInterval;
     private final int optimisticUnchokingInterval;
-    public static final int FileSize;
-    public static final int PieceSize;
+    private final int FileSize;
+    private  final int PieceSize;
 
     public CommonCfg(String fileName, int numberOfPreferredNeighbors, int unchokingInterval,
                      int optimisticUnchokingInterval, int fileSize, int pieceSize) {

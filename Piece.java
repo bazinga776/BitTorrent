@@ -1,4 +1,3 @@
-import com.sun.org.apache.xpath.internal.functions.FuncFalse;
 
 public class Piece {
     boolean present;
@@ -6,9 +5,9 @@ public class Piece {
     byte[] pieceData;
     int pieceIndex;
 
-    public Piece()
+    public Piece(CommonCfg commonCfg)
     {
-        pieceData = new byte[CommonCfg.PieceSize];
+        pieceData = new byte[commonCfg.getPieceSize()];
         pieceIndex = -1;
         present = false;
         fromPeerId = null;

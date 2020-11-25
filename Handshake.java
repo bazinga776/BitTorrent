@@ -13,7 +13,6 @@ public class Handshake
     private byte[] zero_Bits = new byte[Constants.SIZE_OF_ZEROBITS_HANDSHAKE];
 	private String handshake_Msg_Header; 
     private String handshake_Msg_PeerID;
-    static Logger logger = new Logger();
 
     public Handshake()
     {
@@ -23,7 +22,6 @@ public class Handshake
     public Handshake(String h, String p_ID) {
 
 		try {
-            logger.init("hello.txt");
 			this.handshake_Msg_Header = h;
 			this.header = h.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
 			if (this.header.length > Constants.SIZE_OF_HANDSHAKE_HEADER)
@@ -36,7 +34,7 @@ public class Handshake
 
 			this.zero_Bits = "0000000000".getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
 		} catch (Exception e) {
-			logger.printLOG(e.toString()+"in constructor");
+			peerProcess.printLog(e.toString()+"in constructor");
 		}
 
 	}
@@ -50,7 +48,7 @@ public class Handshake
         } 
         catch (UnsupportedEncodingException e) 
         {
-			logger.printLOG(e.toString()+"in setHeader function");
+			peerProcess.printLog(e.toString()+"in setHeader function");
 		}
 	}
 
@@ -64,7 +62,7 @@ public class Handshake
         } 
         catch (UnsupportedEncodingException e) 
         {
-			logger.printLOG(e.toString()+"in setPeerID function");
+			peerProcess.printLog(e.toString()+"in setPeerID function");
 		}
 	}
 	
@@ -120,7 +118,7 @@ public class Handshake
         } 
         catch (Exception e) 
         {
-			logger.printLOG(e.toString()+"in decodeMessage function");
+			peerProcess.printLog(e.toString()+"in decodeMessage function");
 			handshake = null;
 		}
 		return handshake;
@@ -187,26 +185,10 @@ public class Handshake
 		}
 		catch (Exception e) 
 		{
-			logger.printLOG(e.toString()+"in encodeMessage()");
+			peerProcess.printLog(e.toString()+"in encodeMessage()");
 			msg_Send = null;
 		}
         msg_Send=(header+zeros+peerId).getBytes();
 		return msg_Send;
-    }
-    public static void main(String[] args)
-    {
-        Handshake hs = new Handshake("012345678911111111","1001");
-
-        System.out.println("h".length());
-        
-        byte[] handshake=Handshake.encode(hs);
-        System.out.println(new String(handshake));
-        System.out.println(handshake.length);
-        
-        Handshake handshake2=Handshake.decode(handshake);
-        
-        System.out.println(new String(handshake2.getPeerID()));
-        System.out.println(new String(handshake2.getHeader()));
-
     }
 }

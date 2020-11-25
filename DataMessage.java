@@ -1,6 +1,4 @@
-import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 
-import javax.swing.*;
 import java.io.UnsupportedEncodingException;
 
 public class DataMessage {
@@ -12,6 +10,48 @@ public class DataMessage {
     private byte[] length = null;
     private byte[] payload = null;
     private byte[] type = null;
+
+    public DataMessage() { }
+
+    public DataMessage(String Type, byte[] Payload)
+    {
+        try
+        {
+            if (Payload != null)
+            {
+
+                this.setMessageLength(Payload.length + 1);
+                if (this.length.length > Constants.SIZE_OF_DATA_MSG)
+                    throw new Exception("length of data message is too large.");
+
+                this.setPayload(Payload);
+
+            }
+            else
+            {
+                if (Type == Constants.CHOKE_DATA_MESSAGE || Type == Constants.UNCHOKE_DATA_MESSAGE
+                        || Type == Constants.INTERESTED_DATA_MESSAGE
+                        || Type == Constants.NOTINTERESTED_DATA_MESSAGE)
+                {
+                    this.setMessageLength(1);
+                    this.payload = null;
+                }
+                else
+                    throw new Exception("Pay load should not be null");
+
+
+            }
+
+            this.setMessageType(Type);
+            if (this.getMessageType().length > Constants.TYPE_OF_DATA_MSG)
+                throw new Exception("Type of data message length is too large.");
+
+        } catch (Exception e) {
+            peerProcess.printLog(e.toString());
+        }
+
+    }
+
 
     public static int byteArrayToInt(byte[] inputArray) {
         int output = 0;
@@ -92,8 +132,7 @@ public class DataMessage {
         }
         catch (Exception e)
         {
-            Logger logger = new Logger();
-            logger.printLOG(e.toString());
+            peerProcess.printLog(e.toString());
             msgStream = null;
         }
 
@@ -119,8 +158,7 @@ public class DataMessage {
             this.messageType = new String(type, Constants.NAME_OF_MESSAGE_CHAR_SET);
             this.type = type;
         } catch (UnsupportedEncodingException e) {
-            Logger logger = new Logger();
-            logger.printLOG(e.toString());
+            peerProcess.printLog(e.toString());
         }
     }
 
@@ -129,49 +167,8 @@ public class DataMessage {
             this.messageType = messageType.trim();
             this.type = this.messageType.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
         } catch (UnsupportedEncodingException e) {
-            Logger logger = new Logger();
-            logger.printLOG(e.toString());
+            peerProcess.printLog(e.toString());
         }
-    }
-
-    public DataMessage(String Type, byte[] Payload)
-    {
-        try
-        {
-            if (Payload != null)
-            {
-
-                this.setMessageLength(Payload.length + 1);
-                if (this.length.length > Constants.SIZE_OF_DATA_MSG)
-                    throw new Exception("length of data message is too large.");
-
-                this.setPayload(Payload);
-
-            }
-            else
-            {
-                if (Type == Constants.CHOKE_DATA_MESSAGE || Type == Constants.UNCHOKE_DATA_MESSAGE
-                        || Type == Constants.INTERESTED_DATA_MESSAGE
-                        || Type == Constants.NOTINTERESTED_DATA_MESSAGE)
-                {
-                    this.setMessageLength(1);
-                    this.payload = null;
-                }
-                else
-                    throw new Exception("Pay load should not be null");
-
-
-            }
-
-            this.setMessageType(Type);
-            if (this.getMessageType().length > Constants.TYPE_OF_DATA_MSG)
-                throw new Exception("Type of data message length is too large.");
-
-        } catch (Exception e) {
-            Logger logger = new Logger();
-            logger.printLOG(e.toString());
-        }
-
     }
 
 }

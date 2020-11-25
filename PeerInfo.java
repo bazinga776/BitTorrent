@@ -4,6 +4,7 @@ public class PeerInfo {
     private final String peerPort;
     private final boolean hasFile;
     private final boolean isFirst;
+    public int state = -1;
     int index;
 
     public PeerInfo(String peerId, String peerAddress, String peerPort, boolean hasFile, int index,boolean isFirst) {

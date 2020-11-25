@@ -5,13 +5,13 @@ public class BitField {
 
     public int size;
 
-    public BitField()
+    public BitField(CommonCfg commonCfg)
     {
-        size = (int) Math.ceil(((double) CommonCfg.FileSize / (double) CommonCfg.PieceSize));
+        size = (int) Math.ceil(((double) commonCfg.getFileSize() / (double) commonCfg.getPieceSize()));
         this.pieces = new Piece[size];
 
         for (int i = 0; i < this.size; i++)
-            this.pieces[i] = new Piece();
+            this.pieces[i] = new Piece(commonCfg);
 
     }
 
