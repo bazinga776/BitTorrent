@@ -11,8 +11,8 @@ public class MessageHandler implements Runnable{
     }
 
     public void run(){
-        DataMessage dataMessage;
-        DataMessageWrapper dataMessageWrapper;
+        DataMsg dataMessage;
+        DataMsgWrapper dataMessageWrapper;
         String messageType;
         String remotePeerId;
 

@@ -83,8 +83,8 @@ public class PeerInfoHandler implements Runnable{
                     }
                 }
                 // Sending BitField...
-                DataMessage d = new DataMessage(Constants.BITFIELD_DATA_MESSAGE, peerProcess.curBitField.encode());
-                byte  []b = DataMessage.encodeMessage(d);
+                DataMsg d = new DataMsg(Constants.BITFIELD_DATA_MESSAGE, peerProcess.curBitField.encode());
+                byte  []b = DataMsg.encodeMessage(d);
                 outputStream.write(b);
                 peerProcess.peerInfoHashMap.get(peerId).state = 8;
             }else{

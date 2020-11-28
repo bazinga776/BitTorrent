@@ -1,7 +1,7 @@
 
 import java.io.UnsupportedEncodingException;
 
-public class DataMessage {
+public class DataMsg {
 
     private String messageLen;
     private String messageType;
@@ -11,9 +11,9 @@ public class DataMessage {
     private byte[] payload = null;
     private byte[] type = null;
 
-    public DataMessage() { }
+    public DataMsg() { }
 
-    public DataMessage(String Type, byte[] Payload)
+    public DataMsg(String Type, byte[] Payload)
     {
         try
         {
@@ -94,7 +94,7 @@ public class DataMessage {
         this.payload = payload;
     }
 
-    public static byte[] encodeMessage(DataMessage msg)
+    public static byte[] encodeMessage(DataMsg msg)
     {
         byte[] msgStream = null;
         int msgType;

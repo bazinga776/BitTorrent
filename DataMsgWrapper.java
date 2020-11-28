@@ -1,30 +1,30 @@
 
-public class DataMessageWrapper
+public class DataMsgWrapper
 {
-	DataMessage dataMsg;
-	String fromPeerID;
-	
-	public DataMessageWrapper() 
-	{
-		dataMsg = new DataMessage();
-		fromPeerID = null;
-	}
-    public void setFromPeerID(String fromPeerID) {
-        this.fromPeerID = fromPeerID;
-    }
-    
-    public void setDataMsg(DataMessage dataMsg) {
-        this.dataMsg = dataMsg;
-    }
-	
-    public DataMessage getDataMsg() {
-		return dataMsg;
-	}
+    DataMsg dataMessage;
+    String sendingPeerID;
 
-	public String getFromPeerID() {
-		return fromPeerID;
-	}
-	
-	
-	
+    public DataMsgWrapper()
+    {
+        dataMessage = new DataMsg();
+        sendingPeerID = null;
+    }
+    public void setSendingPeerID(String fromPeerID) {
+        this.sendingPeerID = sendingPeerID;
+    }
+
+    public void setDataMsg(DataMsg dataMessage) {
+        this.dataMessage = dataMessage;
+    }
+
+    public DataMsg getDataMessage() {
+        return dataMessage;
+    }
+
+    public String getSendingPeerID() {
+        return sendingPeerID;
+    }
+
+
+
 }
