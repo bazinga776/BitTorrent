@@ -8,8 +8,8 @@ import java.util.*;
 public class Handshake
 {
     Constants Constants = new Constants();
-	private byte[] header = new byte[Constants.SIZE_OF_HANDSHAKE_HEADER];
-	private byte[] peer_ID = new byte[Constants.SIZE_OF_HANDSHAKE_PEERID];
+	private byte[] headerMsg = new byte[Constants.SIZE_OF_HANDSHAKE_HEADER];
+	private byte[] peer_Id = new byte[Constants.SIZE_OF_HANDSHAKE_PEERID];
     private byte[] zero_Bits = new byte[Constants.SIZE_OF_ZEROBITS_HANDSHAKE];
 	private String handshake_Msg_Header; 
     private String handshake_Msg_PeerID;
@@ -23,18 +23,18 @@ public class Handshake
 
 		try {
 			this.handshake_Msg_Header = h;
-			this.header = h.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
-			if (this.header.length > Constants.SIZE_OF_HANDSHAKE_HEADER)
-				throw new Exception("Header is too large.");
+			this.headerMsg = h.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
+			if (this.headerMsg.length > Constants.SIZE_OF_HANDSHAKE_HEADER)
+				throw new Exception("Handshake :: Header Very large");
 
 			this.handshake_Msg_PeerID = p_ID;
-			this.peer_ID = p_ID.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
-			if (this.peer_ID.length > Constants.SIZE_OF_HANDSHAKE_HEADER)
-				throw new Exception("Peer ID is too large.");
+			this.peer_Id = p_ID.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
+			if (this.peer_Id.length > Constants.SIZE_OF_HANDSHAKE_HEADER)
+				throw new Exception("Handshake :: PeerId Very large");
 
 			this.zero_Bits = "0000000000".getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
 		} catch (Exception e) {
-			peerProcess.printLog(e.toString()+"in constructor");
+			peerProcess.printLog("Handshake :: in constructor" +e.toString()+"constructor");
 		}
 
 	}
@@ -44,39 +44,39 @@ public class Handshake
         try 
         {
 			this.handshake_Msg_Header = (new String(HS_header, Constants.NAME_OF_MESSAGE_CHAR_SET)).toString().trim();
-			this.header = this.handshake_Msg_Header.getBytes();
+			this.headerMsg = this.handshake_Msg_Header.getBytes();
         } 
         catch (UnsupportedEncodingException e) 
         {
-			peerProcess.printLog(e.toString()+"in setHeader function");
+			peerProcess.printLog("Handshake :: " + e.toString()+"in setHeader function");
 		}
 	}
 
-    public void setPeerID(byte[] HS_Peer_ID) 
+    public void setPeerId(byte[] HS_Peer_ID) 
     {
         try 
         {
 			this.handshake_Msg_PeerID = (new String(HS_Peer_ID, Constants.NAME_OF_MESSAGE_CHAR_SET)).toString().trim();
-			this.peer_ID = this.handshake_Msg_PeerID.getBytes();
+			this.peer_Id = this.handshake_Msg_PeerID.getBytes();
 
         } 
         catch (UnsupportedEncodingException e) 
         {
-			peerProcess.printLog(e.toString()+"in setPeerID function");
+			peerProcess.printLog("Handshake :: " +e.toString()+"in setPeerId function");
 		}
 	}
 	
-    public byte[] getHeader() 
+    public byte[] getHeaderMsg()
     {
-		return header;
+		return headerMsg;
 	}
 	
-    public byte[] getPeerID() 
+    public byte[] getPeer_Id()
     {
-		return peer_ID;
+		return peer_Id;
 	}
 
-    public byte[] getZeroBits() 
+    public byte[] getZero_Bits()
     {
 		return zero_Bits;
     }
@@ -97,7 +97,7 @@ public class Handshake
         {
             Constants Constants = new Constants();
 			if (msg_Received.length != Constants.SIZE_OF_MESSAGE_HANDSHAKE)
-				throw new Exception("Byte array length not matching.");
+				throw new Exception("Handshake :: LEngth of Byte array is not matching.");
 
             String decode_mString=new String(msg_Received);
             
@@ -118,7 +118,7 @@ public class Handshake
         } 
         catch (Exception e) 
         {
-			peerProcess.printLog(e.toString()+"in decodeMessage function");
+			peerProcess.printLog("Handshake :: " +e.toString()+"in decodeMessage function");
 			handshake = null;
 		}
 		return handshake;
@@ -129,55 +129,55 @@ public class Handshake
         Constants Constants = new Constants();
         byte[] msg_Send = new byte[Constants.SIZE_OF_MESSAGE_HANDSHAKE];
 
-        String header="";
+        String headerMsg="";
         String zeros="";
-        String peerId="";
+        String peer_Id="";
 
         System.out.println(msg_Send.length+" before inserting.");
 
         try 
         {
-            if (handshake.getHeader() == null) 
+            if (handshake.getHeaderMsg() == null)
             {
-				throw new Exception("Invalid Header.");
+				throw new Exception("Handshake :: Invalid Header.");
 			}
-			if (handshake.getHeader().length > Constants.SIZE_OF_HANDSHAKE_HEADER || handshake.getHeader().length == 0)
+			if (handshake.getHeaderMsg().length > Constants.SIZE_OF_HANDSHAKE_HEADER || handshake.getHeaderMsg().length == 0)
 			{
-				throw new Exception("Invalid Header.");
+				throw new Exception("Handshake :: Invalid Header.");
             } 
             else
             {   
-                header=new String(handshake.getHeader());
+                headerMsg=new String(handshake.getHeaderMsg());
             }
 
             System.out.println(msg_Send.length+" bkp1");
 
-            if (handshake.getZeroBits() == null) 
+            if (handshake.getZero_Bits() == null)
             {
-				throw new Exception("Invalid zero bits field.");
+				throw new Exception("Handshake :: Invalid zero bits field.");
 			} 
-            if (handshake.getZeroBits().length > Constants.SIZE_OF_ZEROBITS_HANDSHAKE || handshake.getZeroBits().length == 0)
+            if (handshake.getZero_Bits().length > Constants.SIZE_OF_ZEROBITS_HANDSHAKE || handshake.getZero_Bits().length == 0)
             {
-				throw new Exception("Invalid zero bits field.");
+				throw new Exception("Handshake :: Invalid zero bits field.");
             } 
             else 
             {
-                zeros=new String(handshake.getZeroBits());
+                zeros=new String(handshake.getZero_Bits());
             }
             
 
             System.out.println(msg_Send.length+" bkp2");
-			if (handshake.getPeerID() == null) 
+			if (handshake.getPeer_Id() == null)
 			{
-				throw new Exception("Invalid peer id.");
+				throw new Exception("Handshake :: Invalid peer id.");
 			} 
-			else if (handshake.getPeerID().length > Constants.SIZE_OF_HANDSHAKE_PEERID || handshake.getPeerID().length == 0) 
+			else if (handshake.getPeer_Id().length > Constants.SIZE_OF_HANDSHAKE_PEERID || handshake.getPeer_Id().length == 0)
 			{
-				throw new Exception("Invalid peer id.");
+				throw new Exception("Handshake :: Invalid peer id.");
 			} 
 			else 
 			{   
-                peerId=new String(handshake.getPeerID());
+                peer_Id=new String(handshake.getPeer_Id());
             }
             
             System.out.println(msg_Send.length+" bkp3");
@@ -185,10 +185,10 @@ public class Handshake
 		}
 		catch (Exception e) 
 		{
-			peerProcess.printLog(e.toString()+"in encodeMessage()");
+			peerProcess.printLog("Handshake :: "+e.toString()+"in encodeMessage()");
 			msg_Send = null;
 		}
-        msg_Send=(header+zeros+peerId).getBytes();
+        msg_Send=(headerMsg+zeros+peer_Id).getBytes();
 		return msg_Send;
     }
 }

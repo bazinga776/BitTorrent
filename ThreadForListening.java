@@ -16,13 +16,13 @@ public class ThreadForListening implements Runnable {
         while(true) {
             try {
                 senderPeerSocket = listeningSocket.accept();
-                //Passive type connection
+                //connection type - Passive
                 sender = new Thread(new PeerInfoHandler(senderPeerSocket, 0, serverPeerId));
                 peerProcess.printLog("Established Connection with: " + serverPeerId);
                 peerProcess.threadSending.add(sender);
                 sender.start();
             } catch (Exception ex) {
-                peerProcess.printLog(this.serverPeerId + " Exception in connection: " + ex.toString());
+                peerProcess.printLog("ThreadForListening :: "+this.serverPeerId + " Exception in connection: " + ex.toString());
             }
         }
     }

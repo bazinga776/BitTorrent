@@ -8,22 +8,9 @@ public class Logger {
     public void init(String fileName) {
         try{
         writer = new BufferedWriter(new FileWriter(fileName));}catch (IOException e){
-            System.out.println("There was an exception creating the log file--"+e.toString());
+            System.out.println("There was an exception creating the log file "+e.toString());
         }
     }
-//
-//    public static void main(String args[]) {
-//
-//        Logger logger=new Logger();
-//        try {
-//            logger.init("hello.txt");
-//            logger.LOG("hello world");
-//            logger.LOG("there there");
-//            logger.close();
-//        } catch (Exception e) {
-//            System.out.println(e.toString());
-//        }
-//    }
 
     public void LOG(String str) {
         try {
@@ -40,8 +27,8 @@ public class Logger {
 
     }
 
-    public void close() throws IOException {
-        writer.close();
+    public void close()  {
+        try{
+        writer.close();}catch (Exception e){e.printStackTrace();}
     }
-
 }

@@ -1,17 +1,35 @@
-
 import java.io.UnsupportedEncodingException;
 
 public class DataMsg {
 
-    private String messageLen;
-    private String messageType;
-    Constants Constants = new Constants();
+    private String msgLen;
+    private String msgType;
     private int dataLen = Constants.TYPE_OF_DATA_MSG;
-    private byte[] length = null;
+    private byte[] lgth = null;
     private byte[] payload = null;
     private byte[] type = null;
 
     public DataMsg() { }
+
+    public DataMsg(String msgType){
+        try {
+
+            if (msgType == Constants.CHOKE_DATA_MESSAGE || msgType == Constants.UNCHOKE_DATA_MESSAGE
+                    || msgType == Constants.NOTINTERESTED_DATA_MESSAGE
+                    || msgType == Constants.INTERESTED_DATA_MESSAGE)
+            {
+                this.setMsgLen(1);
+                this.setMsgType(msgType);
+                this.payload = null;
+            }
+            else
+                throw new Exception("DataMsg :: Wrong constructor selected");
+
+
+        } catch (Exception e) {
+            peerProcess.printLog(e.toString());
+        }
+    }
 
     public DataMsg(String Type, byte[] Payload)
     {
@@ -20,8 +38,8 @@ public class DataMsg {
             if (Payload != null)
             {
 
-                this.setMessageLength(Payload.length + 1);
-                if (this.length.length > Constants.SIZE_OF_DATA_MSG)
+                this.setMsgLen(Payload.length + 1);
+                if (this.lgth.length > Constants.SIZE_OF_DATA_MSG)
                     throw new Exception("length of data message is too large.");
 
                 this.setPayload(Payload);
@@ -33,18 +51,16 @@ public class DataMsg {
                         || Type == Constants.INTERESTED_DATA_MESSAGE
                         || Type == Constants.NOTINTERESTED_DATA_MESSAGE)
                 {
-                    this.setMessageLength(1);
+                    this.setMsgLen(1);
                     this.payload = null;
                 }
                 else
-                    throw new Exception("Pay load should not be null");
-
-
+                    throw new Exception("DataMsg :: Pay load should not be null");
             }
 
-            this.setMessageType(Type);
+            this.setMsgType(Type);
             if (this.getMessageType().length > Constants.TYPE_OF_DATA_MSG)
-                throw new Exception("Type of data message length is too large.");
+                throw new Exception("DataMsg :: Type of data message length is very large.");
 
         } catch (Exception e) {
             peerProcess.printLog(e.toString());
@@ -75,11 +91,11 @@ public class DataMsg {
     }
 
     public String getMessageTypeString() {
-        return messageType;
+        return msgType;
     }
 
     public byte[] getMessageLength() {
-        return length;
+        return lgth;
     }
 
     public byte[] getMessageType() {
@@ -98,20 +114,19 @@ public class DataMsg {
     {
         byte[] msgStream = null;
         int msgType;
-        Constants Constants = new Constants();
 
         try
         {
 
             msgType =Integer.parseInt(msg.getMessageTypeString());
             if (msg.getMessageLength().length > Constants.SIZE_OF_DATA_MSG)
-                throw new Exception("Invalid message length.");
+                throw new Exception("DataMsg :: Invalid message length.");
             else if (msgType < 0 || msgType > 7)
-                throw new Exception("Invalid message type.");
+                throw new Exception("DataMsg :: Invalid message type.");
             else if (msg.getMessageType() == null)
-                throw new Exception("Invalid message type.");
+                throw new Exception("DataMsg :: Invalid message type.");
             else if (msg.getMessageLength() == null)
-                throw new Exception("Invalid message length.");
+                throw new Exception("DataMsg :: Invalid message length.");
 
             if (msg.getPayload()!= null) {
                 msgStream = new byte[Constants.SIZE_OF_DATA_MSG + Constants.TYPE_OF_DATA_MSG + msg.getPayload().length];
@@ -139,36 +154,83 @@ public class DataMsg {
         return msgStream;
     }
 
-    public void setMessageLength(byte[] len) {
+    public void setMsgLen(byte[] len) {
 
         Integer l = byteArrayToInt(len);
-        this.messageLen = l.toString();
-        this.length = len;
+        this.msgLen = l.toString();
+        this.lgth = len;
         this.dataLen = l;
     }
 
-    public void setMessageLength(int messageLength) {
+    public void setMsgLen(int messageLength) {
         this.dataLen = messageLength;
-        this.messageLen = ((Integer)messageLength).toString();
-        this.length = intToByteArray(messageLength);
+        this.msgLen = ((Integer)messageLength).toString();
+        this.lgth = intToByteArray(messageLength);
     }
 
-    public void setMessageType(byte[] type) {
+    public void setMsgType(byte[] type) {
         try {
-            this.messageType = new String(type, Constants.NAME_OF_MESSAGE_CHAR_SET);
+            this.msgType = new String(type, Constants.NAME_OF_MESSAGE_CHAR_SET);
             this.type = type;
         } catch (UnsupportedEncodingException e) {
             peerProcess.printLog(e.toString());
         }
     }
 
-    public void setMessageType(String messageType) {
+    public void setMsgType(String msgType) {
         try {
-            this.messageType = messageType.trim();
-            this.type = this.messageType.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
+            this.msgType = msgType.trim();
+            this.type = this.msgType.getBytes(Constants.NAME_OF_MESSAGE_CHAR_SET);
         } catch (UnsupportedEncodingException e) {
             peerProcess.printLog(e.toString());
         }
+    }
+
+    public static DataMsg decodeMessage(byte[] Message) {
+
+        DataMsg msg = new DataMsg();
+        byte[] msgLength = new byte[Constants.SIZE_OF_DATA_MSG];
+        byte[] msgType = new byte[Constants.TYPE_OF_DATA_MSG];
+        byte[] payLoad = null;
+        int len;
+
+        try
+        {
+
+            if (Message == null)
+                throw new Exception("DataMsg :: Invalid data.");
+            else if (Message.length < Constants.SIZE_OF_DATA_MSG + Constants.TYPE_OF_DATA_MSG)
+                throw new Exception("DataMsg :: Byte array length is too small...");
+
+
+            System.arraycopy(Message, 0, msgLength, 0, Constants.SIZE_OF_DATA_MSG);
+            System.arraycopy(Message, Constants.SIZE_OF_DATA_MSG, msgType, 0, Constants.TYPE_OF_DATA_MSG);
+
+            msg.setMsgLen(msgLength);
+            msg.setMsgType(msgType);
+
+            len = byteArrayToInt(msgLength);
+
+            if (len > 1)
+            {
+                payLoad = new byte[len-1];
+                System.arraycopy(Message, Constants.SIZE_OF_DATA_MSG + Constants.TYPE_OF_DATA_MSG,	payLoad, 0, Message.length - Constants.SIZE_OF_DATA_MSG - Constants.TYPE_OF_DATA_MSG);
+                msg.setPayload(payLoad);
+            }
+
+            payLoad = null;
+        }
+        catch (Exception e)
+        {
+            peerProcess.printLog("DataMsg :: "+e.toString());
+            msg = null;
+        }
+        return msg;
+    }
+
+
+    public int getMessageLengthInt() {
+        return this.dataLen;
     }
 
 }
